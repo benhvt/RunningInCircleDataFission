@@ -157,20 +157,25 @@ theta_share_df <- data.frame(Gene = theta_share[[1]],
                              CD4 = theta_share[[5]],
                              memory.b = theta_share[[6]])
 
+firstup <- function(x) {
+  substr(x, 1, 1) <- toupper(substr(x, 1, 1))
+  x
+}
+
 pair_cellPop <- combn(2:(length(cell_pop_to_test)+1),2)
 allPairplot <- lapply(1:ncol(pair_cellPop), function(p){
   if (colnames(theta_share_df)[pair_cellPop[1,p, drop = T]] == "memory.b"){
     lab_x <- "memory b cells"
   }
   else{
-    lab_x <- colnames(theta_share_df)[pair_cellPop[1,p, drop = T]]
+    lab_x <- firstup(colnames(theta_share_df)[pair_cellPop[1,p, drop = T]])
   }
   
   if (colnames(theta_share_df)[pair_cellPop[2,p, drop = T]] == "memory.b"){
     lab_y <- "memory b cells"
   }
   else{
-    lab_y <- colnames(theta_share_df)[pair_cellPop[2,p, drop = T]]
+    lab_y <- firstup(colnames(theta_share_df)[pair_cellPop[2,p, drop = T]])
   }
   df_temp <- data.frame(Gene = theta_share_df$Gene, 
                         Pop1 = theta_share_df[,pair_cellPop[1,p, drop = T]],
@@ -187,7 +192,8 @@ allPairplot <- lapply(1:ncol(pair_cellPop), function(p){
     # geom_label(aes(x = Inf, y = Inf, label = paste("RMSE =", round(rmse, 2))), 
     #            hjust = 1, vjust = 1, size = 6, color = "white", fill = "darkred") +
     facet_grid(~rmse) +
-    scale_x_log10() +
+    scale_x_log10(breaks = c(0.01, 0.1, 1, 10), 
+                  labels = c(0.01, 0.1, 1, 10)) +
     scale_y_log10() +
     annotation_logticks(side = "bl") +
     theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
@@ -195,7 +201,7 @@ allPairplot <- lapply(1:ncol(pair_cellPop), function(p){
 })
 
 # do.call(cowplot::plot_grid, allPairplot)
-plt <- ((allPairplot[[1]]+ ggtitle("C") + theme(plot.title = element_text(face = "bold", size = 20)))  + allPairplot[[2]] + allPairplot[[3]] + allPairplot[[4]]) + plot_layout(nrow = 1) 
+plt <- ((allPairplot[[1]]+ ggtitle("C") + theme(plot.title = element_text(face = "bold", size = 20))) + plot_spacer()  + allPairplot[[2]] + plot_spacer()  + allPairplot[[3]] + plot_spacer()  + allPairplot[[4]]) + plot_layout(nrow = 1, widths = c(4,.5,4,.5,4,.5,4)) 
 
 source("codes/Figure4.R")
 
