@@ -44,6 +44,16 @@ tau <- .4
 
 sim_res <- sim_fun_sigma(n=n, sigma = sigma, sigma_hat = sigma_grid, tau = tau, nsim = nsimu) 
 
+sigma_grid_plot <- seq(0, 6*max(sigma), length.out = 1000)
+typeI_theo <- lapply(sigma_grid_plot, function(s){
+  temp <- compute_typeI(n, tau , sigma, sigma_hat = s, alpha = .05)
+  return(data.frame(TypeItheo = temp,
+                    sigma_hat = s,
+                    sigma = sigma))
+})
+
+typeI_df <- do.call(rbind.data.frame, typeI_theo) %>% mutate(sigma_name = paste0("sigma^2==", sigma^2))
+  
 df_res_sigma <- data.frame(EmpTypeI = unlist(sim_res),
                            sigma = rep(sigma, each = length(sigma_grid)),
                            sigma_hat = rep(sigma_grid, length(sigma))) %>%
@@ -55,7 +65,8 @@ df_res_sigma <- data.frame(EmpTypeI = unlist(sim_res),
 plot_sigma <-  ggplot(df_res_sigma) + aes(x=Ratio, y = value, colour = sigma_name) +
   geom_point(data = subset(df_res_sigma, variable == "EmpTypeI"), aes(shape = "Empirical"), size = 4) +
   scale_shape_manual(name = "Empirical", values = 2, labels = '', guide = "legend") +
-  geom_line(data = subset(df_res_sigma, variable == "TheTypeI"), aes(group = sigma_name, linetype = "Theoritical"), size = 1) +
+  # geom_line(data = subset(df_res_sigma, variable == "TheTypeI"), aes(group = sigma_name, linetype = "Theoritical"), size = 1) +
+  geom_line(data = typeI_df, aes(x= (sigma^2-sigma_hat^2)/sigma^2, y = TypeItheo, group = sigma_name, colour = sigma_name, linetype = "Theoritical"), size = 1) +
   scale_linetype_manual(name = "Theoritical", values = 1, labels = "", guide = "legend") +
   scale_colour_manual(name = '',
                       values = c("#93B5C6", "#DBC2CF", "#998bc0", "#BD4F6C"),
@@ -96,6 +107,7 @@ nsimu <- 1000
 tau <- .4
 
 sim_res_n <- sim_fun_n(n_grid=n, sigma = sigma, sigma_hat = sigma_grid, tau = tau, nsim = nsimu) 
+
 
 df_res_n <-  data.frame(EmpTypeI = unlist(sim_res_n),
                         sigma = sigma,
