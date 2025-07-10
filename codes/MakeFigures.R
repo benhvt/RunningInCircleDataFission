@@ -154,6 +154,7 @@ plt_illu_power <- data.frame(X1 = X[,1],
   scale_colour_manual(name = "Estimated clusters",
                       values = c("#294122", "#EB3D00")) +
   theme_classic() + 
+  theme(legend.position = "top") +
   xlab(TeX(r'($X_1$)')) +
   ylab(TeX(r'($X_2$)'))
 
@@ -178,7 +179,7 @@ plt_power <- ggplot(powerResults) +
   aes(x=tau, y = Power, 
       colour = as.factor(n),
       linetype = Fission_lab) +
-  geom_line(linewidth = 1.1, 
+  geom_line(linewidth = .75,
             alpha = .8) +
   scale_colour_manual(name = "Sample Size",
                       values = MetBrewer::met.brewer("Derain", n=7)) +
@@ -194,7 +195,7 @@ plt_ari <- ggplot(ariResults) +
   aes(x=tau, y = ARI_m, 
       colour = as.factor(n),
       linetype = Fission_lab) +
-  geom_line(linewidth = 1.1, 
+  geom_line(linewidth = .75, 
             alpha = .8) +
   scale_colour_manual(name = "Sample Size",
                       values = MetBrewer::met.brewer("Derain", n=7)) +
@@ -202,7 +203,7 @@ plt_ari <- ggplot(ariResults) +
                         values = c(1,6)) +
   ggnewscale::new_scale_colour() +
   xlab(TeX(r'( Tunning parameter $\tau$)')) +
-  ylab("Adjusted Rand Index")
+  ylab("Adjusted Rand \n Index")
 
 
 
@@ -229,6 +230,7 @@ plt_illu_typeI <- data.frame(X1 = X[,1],
   scale_colour_manual(name = "Estimated clusters",
                       values = c("#294122", "#EB3D00", "#FFBBA6")) +
   theme_classic() + 
+  theme(legend.position = "bottom") +
   xlab(TeX(r'($X_1$)')) +
   ylab(TeX(r'($X_2$)'))
 
@@ -244,7 +246,7 @@ plt_typeI <- adverse_sc %>%
   aes(x=tau, y = TypeI, 
       colour = as.factor(n),
       linetype = Fission_lab) +
-  geom_line(linewidth = 1.1, 
+  geom_line(linewidth = .75, 
             alpha = .8) +
   scale_colour_manual(name = "Sample Size",
                       values = MetBrewer::met.brewer("Derain", n=7)) +
@@ -253,7 +255,7 @@ plt_typeI <- adverse_sc %>%
   ggnewscale::new_scale_colour() +
   geom_hline(aes(yintercept = 0.05, 
                  colour = "5% nominal level"),
-             linewidth = .9, 
+             linewidth = .75, 
              linetype = "dashed") +
   scale_colour_manual(name = "",
                       values = "#DB2763") +
@@ -262,13 +264,17 @@ plt_typeI <- adverse_sc %>%
   xlab(TeX(r'( Tunning parameter $\tau$)')) +
   ylab("Type I error rate \n 5% nominal levels") 
 
-figure2 <-  (plt_illu_power + ((plt_power / plt_ari) + plot_layout(heights = c(2, 1.5)))) /
-  (plt_illu_typeI + plt_typeI) +
-  plot_layout(guides = "collect", heights = c(2,1.5)) +
-  plot_annotation(tag_levels = 'A') &
-  theme_classic(base_size = 14) +
+figure2 <- (
+  ((plt_illu_power + theme(legend.position = "top")) /
+     (plt_illu_typeI + theme(legend.position = "bottom"))) |
+    (((plt_power / plt_ari) / plt_typeI) + plot_layout(guides = "collect"))
+) +
+  plot_layout(widths = c(1.5, 2)) +
+  plot_annotation(tag_levels = list(c("A", "D", "B", "C", "E"))) &
+  theme(text = element_text(size = 14)) &
   theme(plot.tag = element_text(face = "bold"))
 figure2
+
 ggsave(plot = figure2,
        filename = "Figures/figure2.pdf",
        width = 300, 
