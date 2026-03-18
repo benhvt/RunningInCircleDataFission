@@ -1,0 +1,17 @@
+% latex table generated in R 4.2.1 by xtable 1.8-4 package
+% Fri Feb 13 14:18:23 2026
+\begin{table}[ht]
+\centering
+\begin{tabular}{lr}
+  \hline
+Method & Type.I \\ 
+  \hline
+Multivariate Clustering & 1.00 \\ 
+  Univariate Clustering & 0.05 \\ 
+   \hline
+\end{tabular}
+\caption{Type I error rates from Wilcoxon tests after Negative Binomial data thinning. 
+  In the multivariate setting, k-means clustering is performed on all 500 genes in X^{(1)}, 
+  and Wilcoxon tests are applied gene-wise on X^{(2)}. 
+  In the univariate setting, clustering is performed individually for each gene in X^{(1)}.} 
+\end{table}

@@ -76,3 +76,16 @@ negbin_list <- lapply(negbin_files, read.csv)
 negbin_results <- do.call("rbind.data.frame", negbin_list)
 write.csv(negbin_results, file = "results/TypeIThinningNegBin.csv",
           row.names = FALSE)
+
+#------------------------------------------------------------------------------#
+#                                 Figures                                      #
+#             Correlation And relative biais impact on Type I                  # 
+#------------------------------------------------------------------------------#
+
+cor_files <- list.files(path = "raw_results/sim_CorrelationAndBiais/",
+                           full.names = TRUE)
+cor_list <- lapply(cor_files, read.csv)
+
+cor_results <- do.call("rbind.data.frame", cor_list)
+write.csv(cor_results, file = "results/CorrelationAndRelativeBiais.csv",
+          row.names = FALSE)
