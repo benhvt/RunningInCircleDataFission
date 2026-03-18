@@ -12,6 +12,7 @@ This repository contains code to reproduce simulations and Figure of the article
     ├── raw_results
     ├── results
     ├── Figures
+    ├── Supplementary Figures
     ├── LICENSE
     ├── README.md
     └── RunningInCircleV2.Rproj
@@ -38,3 +39,7 @@ To optimize computation time, most of the simulations were run on [CURTA](https:
 ### Figures
 
 This folder contains all the figures generated with `R` script `codes/MakeFigures.R` .
+
+### Supplementary Figures
+
+This folder contains all the figures generated with `R` script `SupplementaryCodes.R` .
