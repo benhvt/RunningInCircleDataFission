@@ -1,0 +1,5 @@
+"Thinning","Clustering","TypeI","Power"
+"Conditional","Multivariate",0.1,1
+"Conditional","Univariate",0.032,1
+"Marginal","Multivariate",0.1,1
+"Marginal","Univariate",0.036,0.108
