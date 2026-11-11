@@ -1,7 +1,8 @@
 # Conditional vs marginal NB data thinning on a controlled mixture of two cell
 # populations (granulocytes + CD24 neutrophils, Tabula Sapiens bone marrow
 # data, donor TSP14), with 250 truly DE genes (H1) and 250 non-DE genes (H0)
-# -> Supplementary Figures S4-S5 (Appendix A7); < 1 min
+# -> data and results for Figure 3 and Supplementary Figures S4-S5 (Appendix A7);
+# < 1 min
 
 source("R/utils.R")
 library(Seurat)
@@ -21,7 +22,7 @@ cell_type <- cells$cell_ontology_class
 keep <- rowMeans(counts == 0) < 1
 counts <- counts[c(which(keep & cell_type == "granulocyte"), which(keep & cell_type == "cd24 neutrophil")), ]
 true_cell <- factor(rep(c("granulocyte", "cd24 neutrophil"), c(sum(keep & cell_type == "granulocyte"),
-                                                               sum(keep & cell_type == "cd24 neutrophil"))))
+  sum(keep & cell_type == "cd24 neutrophil"))))
 true_pval <- apply(counts, 2, wilcox_pvalue, groups = true_cell)
 
 cluster_and_test <- function(split, seed) {
@@ -36,8 +37,8 @@ cluster_and_test <- function(split, seed) {
     data.frame(pvalue = wilcox_pvalue(Xtest[, p], cl_p), ARI = mclust::adjustedRandIndex(cl_p, true_cell))
   }, cl = n_cores))
   rbind(data.frame(univ, Clustering = "Univariate"),
-        data.frame(pvalue = apply(Xtest, 2, wilcox_pvalue, groups = cl),
-                   ARI = mclust::adjustedRandIndex(cl, true_cell), Clustering = "Multivariate"))
+    data.frame(pvalue = apply(Xtest, 2, wilcox_pvalue, groups = cl),
+      ARI = mclust::adjustedRandIndex(cl, true_cell), Clustering = "Multivariate"))
 }
 
 thin <- function(X) countsplit(X, folds = 2, epsilon = 0.5, overdisps = estimate_theta(X))
@@ -47,14 +48,14 @@ set.seed(202601)
 by_type <- lapply(levels(true_cell)[2:1], function(type) thin(counts[true_cell == type, ]))
 cond <- cluster_and_test(lapply(1:2, function(f) rbind(by_type[[1]][[f]], by_type[[2]][[f]])), seed = 202602)
 
-results <- data.frame(rbind(cbind(cond, Thinning = "Conditional"), 
-                            cbind(marg, Thinning = "Marginal")),
-                      Gene = colnames(counts), 
-                      Hyp = rep(c("H1", "H0"),
-                                each = 250),
-                      GeneSymbol = TS_14[["RNA"]][[]][colnames(counts), "feature_name"], 
-                      TruePvalue = true_pval)
+results <- data.frame(rbind(cbind(cond, Thinning = "Conditional"),
+  cbind(marg, Thinning = "Marginal")),
+Gene = colnames(counts),
+Hyp = rep(c("H1", "H0"),
+  each = 250),
+GeneSymbol = TS_14[["RNA"]][[]][colnames(counts), "feature_name"],
+TruePvalue = true_pval)
 
 saveRDS(list(counts = counts, true_cell = true_cell, results = results,
-             n_cells = c(table(as.character(cell_type)), kept = table(true_cell))),
-        file.path(res_dir, "app07_granulocytes_neutrophils.rds"))
+  n_cells = c(table(as.character(cell_type)), kept = table(true_cell))),
+file.path(res_dir, "app07_granulocytes_neutrophils.rds"))

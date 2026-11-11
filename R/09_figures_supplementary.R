@@ -30,7 +30,7 @@ plot_S1 <- function(file, theo, group, colours, labels) {
   ggplot(emp, aes((sigma^2 - sigma_hat^2) / sigma^2, typeI, colour = factor(.data[[group]]))) +
     geom_point(aes(shape = "Empirical"), size = 4) +
     geom_line(data = if (is.null(theo)) emp else theo,
-              aes(y = typeI_theoretical(n, sigma, sigma_hat), linetype = "Theoretical"), linewidth = 1) +
+      aes(y = typeI_theoretical(n, sigma, sigma_hat), linetype = "Theoretical"), linewidth = 1) +
     scale_shape_manual(name = "Empirical", values = 2, labels = "") +
     scale_linetype_manual(name = "Theoretical", values = 1, labels = "") +
     scale_colour_manual(name = "", values = colours, labels = labels) +
@@ -42,17 +42,17 @@ plot_S1 <- function(file, theo, group, colours, labels) {
 }
 
 S1A <- plot_S1("sim02_variance_bias_S1A.rds", group = "sigma",
-               theo = expand.grid(sigma_hat = seq(0, 12, length.out = 1000), sigma = c(0.1, 0.5, 1, 2), n = 100),
-               colours = c("#93B5C6", "#DBC2CF", "#998bc0", "#BD4F6C"),
-               labels = parse(text = paste("sigma^2 ==", c(0.01, 0.25, 1, 4)))) + xlim(-5, 2)
+  theo = expand.grid(sigma_hat = seq(0, 12, length.out = 1000), sigma = c(0.1, 0.5, 1, 2), n = 100),
+  colours = c("#93B5C6", "#DBC2CF", "#998bc0", "#BD4F6C"),
+  labels = parse(text = paste("sigma^2 ==", c(0.01, 0.25, 1, 4)))) + xlim(-5, 2)
 S1B <- plot_S1("sim02_variance_bias_S1B.rds", theo = NULL, group = "n",
-               colours = colorRampPalette(c("#008154", "#0092a4", "#2a2956"))(5),
-               labels = paste0("n=", c(50, 100, 200, 500, 1000)))
+  colours = colorRampPalette(c("#008154", "#0092a4", "#2a2956"))(5),
+  labels = paste0("n=", c(50, 100, 200, 500, 1000)))
 save_fig(S1A + S1B + plot_annotation(tag_levels = "A") &
-           theme(axis.title = element_text(size = 24), axis.text = element_text(size = 18),
-                 legend.text = element_text(size = 16), legend.title = element_text(size = 18),
-                 plot.tag = element_text(face = "bold", size = 24), legend.spacing = unit(0.01, "cm")),
-         "FigureS1", 350, 120)
+  theme(axis.title = element_text(size = 24), axis.text = element_text(size = 18),
+    legend.text = element_text(size = 16), legend.title = element_text(size = 18),
+    plot.tag = element_text(face = "bold", size = 24), legend.spacing = unit(0.01, "cm")),
+"FigureS1", 350, 120)
 
 #------------------------------------------------------------------------------#
 # Figures S2-S3: QQ-plots of the Wilcoxon p-values of the first and last
@@ -61,7 +61,7 @@ save_fig(S1A + S1B + plot_annotation(tag_levels = "A") &
 
 pvals <- read_res("sim04_correlation_bias.rds")$pvalues %>%
   mutate(VarName = ifelse(Variable == "Var1", "X[1]", "X[50]"),
-         MethodName = ifelse(Method == "NB", "Negative~Binomial~Thinning", "Gaussian~Fission"))
+    MethodName = ifelse(Method == "NB", "Negative~Binomial~Thinning", "Gaussian~Fission"))
 plot_qq <- function(df, colour) {
   ggplot(df) +
     geom_abline(slope = 1, intercept = 0, col = "red", linewidth = 1.2, alpha = .7) +
@@ -72,12 +72,12 @@ plot_qq <- function(df, colour) {
     theme(text = element_text(size = 14))
 }
 save_fig(plot_qq(filter(pvals, Estimation == "Oracle", Error == 1), "Rho") +
-           scale_colour_manual(name = TeX("Correlation ($\\rho$)"), values = rho_colours),
-         "FigureS2", 200, 150)
+  scale_colour_manual(name = TeX("Correlation ($\\rho$)"), values = rho_colours),
+"FigureS2", 200, 150)
 save_fig(plot_qq(filter(pvals, Estimation == "Wrong", Rho == 0, Error %in% c(0.001, 0.5, 1, 1.5, 5)) %>%
-                   mutate(RelativeBias = Error - 1), "RelativeBias") +
-           MetBrewer::scale_color_met_d("Hiroshige") + labs(colour = "Relative Bias"),
-         "FigureS3", 200, 150)
+  mutate(RelativeBias = Error - 1), "RelativeBias") +
+  MetBrewer::scale_color_met_d("Hiroshige") + labs(colour = "Relative Bias"),
+"FigureS3", 200, 150)
 
 #------------------------------------------------------------------------------#
 # Figures S4 and S9: GLM-PCA and UMAP of the Tabula Sapiens datasets
@@ -116,15 +116,19 @@ plot_S5 <- function(hyp) {
     geom_point(alpha = .5, size = 2) +
     geom_hline(yintercept = -log10(0.05)) +
     facet_grid(ClusteringName ~ ThinningName, scales = "free") +
-    scale_colour_viridis_c(option = "plasma", direction = -1, limits = c(min(res$ARI), 1),
-                           guide = guide_colourbar(barwidth = unit(5, "cm"))) +
+    scale_colour_gradientn(
+      colours = MetBrewer::met.brewer("Greek", direction = -1),
+      limits = c(min(res$ARI), 1), breaks = seq(0, 1, by = 0.25),
+      labels = c("0", "0.25", "0.5", "0.75", "1"),
+      oob = scales::squish,
+      guide = guide_colourbar(barwidth = unit(5, "cm"))) +
     labs(x = "-log10(True p-value)", y = "-log10(p-value)",
-         title = TeX(paste0("Distribution of p-values for genes under $H_", substr(hyp, 2, 2), "$")))
+      title = TeX(paste0("Distribution of p-values for genes under $H_", substr(hyp, 2, 2), "$")))
 }
 top5 <- res %>% filter(Hyp == "H1") %>% group_by(ThinningName, ClusteringName) %>% arrange(pvalue) %>% slice_head(n = 5)
 save_fig(plot_S5("H0") / (plot_S5("H1") + ggrepel::geom_label_repel(data = top5, aes(label = GeneSymbol), seed = 1)) +
-           plot_layout(guides = "collect") & theme_bw() + theme(legend.position = "bottom", text = element_text(size = 14)),
-         "FigureS5", 150, 250)
+  plot_layout(guides = "collect") & theme_bw() + theme(legend.position = "bottom", text = element_text(size = 14)),
+"FigureS5", 150, 250)
 
 performances <- res %>%
   group_by(Thinning, Clustering) %>%
@@ -177,19 +181,19 @@ ari <- ideal %>%
   facet_grid(~Fission) +
   size_colours +
   scale_y_continuous(breaks = c(0, 0.5, 1)) +
-  tau_lab + labs(y = "Adjusted Rand \n Index") +
+  tau_lab + labs(y = "Adjusted\nRand Index") +
   guides(colour = guide_legend(nrow = 2))
 save_fig(plot_illustration(cl_ideal, c("#294122", "#EB3D00")) +
-           (ari / plot_rejection(ideal, "Statistical Power \n 5% level") +
-              plot_layout(guides = "collect", heights = c(1, 4))) +
-           plot_layout(widths = c(.8, 1)) + plot_annotation(tag_levels = "A") &
-           theme(legend.position = "bottom", text = element_text(size = 12), plot.tag = element_text(face = "bold")),
-         "FigureS6", 190, 120)
+  (ari / plot_rejection(ideal, "Statistical Power \n 5% level") +
+    plot_layout(guides = "collect", heights = c(1, 4))) +
+  plot_layout(widths = c(.8, 1)) + plot_annotation(tag_levels = "A") &
+  theme(legend.position = "bottom", text = element_text(size = 12), plot.tag = element_text(face = "bold")),
+"FigureS6", 190, 120)
 save_fig(plot_illustration(cl_adverse, c("#294122", "#EB3D00", "#FFBBA6")) +
-           plot_rejection(read_res("sim01_adverse.rds"), "Type I error rate \n 5% nominal levels") +
-           plot_layout(widths = c(.8, 1)) + plot_annotation(tag_levels = "A") &
-           theme(text = element_text(size = 12), plot.tag = element_text(face = "bold")),
-         "FigureS7", 190, 110)
+  plot_rejection(read_res("sim01_adverse.rds"), "Type I error rate \n 5% nominal levels") +
+  plot_layout(widths = c(.8, 1)) + plot_annotation(tag_levels = "A") &
+  theme(text = element_text(size = 12), plot.tag = element_text(face = "bold")),
+"FigureS7", 190, 110)
 
 #------------------------------------------------------------------------------#
 # Figure S8: overdispersions estimated within 4 cell populations vs neutrophils
@@ -197,24 +201,24 @@ save_fig(plot_illustration(cl_adverse, c("#294122", "#EB3D00", "#FFBBA6")) +
 theta <- read_res("app05_overdispersion.rds")
 plot_S8 <- function(pop) {
   rmse <- round(sqrt(mean((theta$neutrophil - theta[[pop]])^2)), 2)
-  ggplot(theta, 
-         aes(neutrophil, .data[[pop]])) +
+  ggplot(theta,
+    aes(neutrophil, .data[[pop]])) +
     scattermore::geom_scattermore(pointsize = 4, alpha = .3) +
-    geom_abline(slope = 1, 
-                intercept = 0, 
-                colour = "darkred", 
-                linetype = "dashed", 
-                linewidth = 1) +
+    geom_abline(slope = 1,
+      intercept = 0,
+      colour = "darkred",
+      linetype = "dashed",
+      linewidth = 1) +
     facet_grid(~ paste0("RMSE=", rmse)) +
-    scale_x_log10(breaks = c(0.01, 0.1, 1, 10), 
-                  labels = c(0.01, 0.1, 1, 10)) +
+    scale_x_log10(breaks = c(0.01, 0.1, 1, 10),
+      labels = c(0.01, 0.1, 1, 10)) +
     scale_y_log10() +
     annotation_logticks(sides = "bl") +
     labs(x = "Neutrophil", y = sub("^(.)", "\\U\\1", pop, perl = TRUE))
 }
 save_fig(wrap_plots(lapply(c("macrophage", "monocyte", "granulocyte", "CD4"), plot_S8),
-                    nrow = 1) +
-           plot_annotation(tag_levels = "A") &
-           theme(text = element_text(size = 14),
-                 plot.tag = element_text(face = "bold")),
-         "FigureS8", 200, 75)
+  nrow = 1) +
+  plot_annotation(tag_levels = "A") &
+  theme(text = element_text(size = 14),
+    plot.tag = element_text(face = "bold")),
+"FigureS8", 200, 75)
